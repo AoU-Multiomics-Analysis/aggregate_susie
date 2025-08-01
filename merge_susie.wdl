@@ -10,7 +10,7 @@ task AggregateSusie{
     }
 
     command <<<
-    for file in ~{sep='\n' SusieParquets}; do
+    for file in ~{sep=' ' SusieParquets}; do
        echo $file >> filelist.txt
     done
 
