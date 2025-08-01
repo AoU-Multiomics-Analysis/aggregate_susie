@@ -20,7 +20,7 @@ task AggregateSusie{
     >>>
 
     runtime {
-        docker: "quay.io/biocontainers/htslib:1.22.1--h566b1c6_0"
+        docker: "ghcr.io/aou-multiomics-analysis/aggregate_susie:main"
         disks: "local-disk 500 SSD"
         memory: "{Memory}GB"
         cpu: "1"
