@@ -22,7 +22,7 @@ task AggregateSusie{
     runtime {
         docker: "ghcr.io/aou-multiomics-analysis/aggregate_susie:main"
         disks: "local-disk 500 SSD"
-        memory: "{Memory}GB"
+        memory: "~{Memory}GB"
         cpu: "1"
     }
  
