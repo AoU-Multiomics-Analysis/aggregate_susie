@@ -13,6 +13,7 @@ task AggregateSusie{
     echo ~{SusieParquets}
     for file in ~{sep=' ' SusieParquets}; do
        echo $file
+       ls $file
        echo $file >> filelist.txt
     done
     echo filelist.txt
