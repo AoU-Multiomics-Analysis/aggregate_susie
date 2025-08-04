@@ -4,19 +4,17 @@ version 1.0
 
 task AggregateSusie{
     input{
-        Array[File] SusieParquets
+        Array[String] SusieParquets
         Int Memory
         String OutputPrefix
     }
 
     command <<<
+    mkdir inputs
     for file in ~{sep=' ' SusieParquets}; do
-       echo $file
-       ls $file
-       echo $file >> filelist.txt
+       gcloud storage cp $file inputs/
     done
-    echo filelist.txt
-    cat filelist.txt
+    readlink -f inputs/* >> filelist.txt
 
     Rscript /tmp/merge_susie.R --FilePaths filelist.txt  --OutputPrefix ~{OutputPrefix}
     >>>
