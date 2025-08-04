@@ -11,8 +11,11 @@ task AggregateSusie{
 
     command <<<
     for file in ~{sep=' ' SusieParquets}; do
+       echo $file
        echo $file >> filelist.txt
     done
+    echo filelist.txt
+    cat filelist.txt
 
     Rscript /tmp/merge_susie.R --FilePaths filelist.txt  --OutputPrefix ~{OutputPrefix}
     >>>
