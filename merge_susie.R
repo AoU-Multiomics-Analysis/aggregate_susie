@@ -45,7 +45,7 @@ variant_df <- dplyr::tibble(
 )
 
 counter <- 0
-for (x in filepath_df$path){
+for (x in filepath_df){
 current_dat <- arrow::read_parquet(x)
 variant_df <- bind_rows(variant_df,current_dat)
 counter <- counter + 1 
