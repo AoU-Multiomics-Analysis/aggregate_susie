@@ -36,7 +36,7 @@ task AggregateSusie{
 
 workflow AggregateSusieWorkflow {
     input {
-        Array[String] SusieParquets 
+        Array[File] SusieParquets 
         Int Memory 
         String OutputPrefix
     }
