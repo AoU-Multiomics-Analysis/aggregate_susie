@@ -40,22 +40,29 @@ option_list <- list(
                         help="sample metadata file path of genes used in expression-matrix. tab separated", metavar = "type")
 )
 
+message('Parsing command line arguments')
 opt <- optparse::parse_args(optparse::OptionParser(option_list=option_list))
 
 OutputPrefix <- opt$OutputPrefix
 
 
 annotated_parquet <- paste0(opt$OutputPrefix,'_SusieMerged.annotated.parquet') 
-
+message(paste0('Writing to:',annotated_parquet))
 
 ########### LOAD DATA ############
 
 
+message('Loading allele frequencies')
 allele_frequencies <- load_afreq_data(opt$PlinkAfreq)
+
+message('Loading finemapping')
 susie_res <- load_finemapping_data(opt$SusieParquet)
 
 
+message('Loading GTF')
 gene_data <- rtracklayer::readGFF(opt$GencodeGTF) %>% filter(type == 'gene')
+
+message('Extracting TSS  locations')
 tss_data <- gene_data %>% mutate(tss = case_when(strand == '+' ~ start,TRUE ~ end)) %>% 
             dplyr::select(seqid,tss,gene_id,gene_type,gene_name) %>% 
             mutate(start = tss,end = tss ) %>% 
@@ -63,6 +70,7 @@ tss_data <- gene_data %>% mutate(tss = case_when(strand == '+' ~ start,TRUE ~ en
 
 
 
+message('Annotating fine-mapping data')
 annotated_fm_res <-  susie_res %>%
   mutate(group = OutputPrefix) %>% 
   left_join(allele_frequencies %>% select(-REF,-ALT),by = c('variant' = 'ID','group')) %>% 
@@ -75,10 +83,12 @@ annotated_fm_res <-  susie_res %>%
         )
       ) %>% 
     mutate(gene_id = str_remove(molecular_trait_id,'.*_'))  %>% 
-    left_join(tss_data %>% data.frame()%>% select(-seqnames,-start,-end,-width,-strand) ,by = 'gene_id')  %>% 
+    left_join(tss_data %>% data.frame() %>% select(-seqnames,-start,-end,-width,-strand) ,by = 'gene_id')  %>% 
     mutate(distTSS = as.numeric(position) - as.numeric(tss),
-           PIP_bin = cut(pip,breaks = 5))  
+           PIP_bin = cut(pip,breaks = 5)
+    )  
 
 
+message('Writing to output') 
 annotated_fm_res %>% arrow::write_parquet(annotated_parquet)
  
