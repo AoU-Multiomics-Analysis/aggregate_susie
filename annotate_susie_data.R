@@ -1,7 +1,7 @@
 library(tidyverse)
 library(data.table)
 library(rtracklayer)
-library(arrrow)
+library(arrow)
 library(plyranges)
 
 load_afreq_data <- function(afreq_path){
