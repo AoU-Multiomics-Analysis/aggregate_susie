@@ -44,13 +44,7 @@ task AnnotateSusie {
      
     }
     command <<<
-    Rscript /tmp/annotate_susie_data.R \ 
-        --OutputPrefix ~{OutputPrefix} \
-        --GencodeGTF ~{GencodeGTF} \
-        --PlinkAfreq ~{PlinkAfreq} \
-        --SusieParquet ~{SusieParquet}
-
-
+    Rscript /tmp/annotate_susie_data.R --OutputPrefix ~{OutputPrefix} --GencodeGTF ~{GencodeGTF} --PlinkAfreq ~{PlinkAfreq} --SusieParquet ~{SusieParquet}
     >>>
    runtime {
         docker: "ghcr.io/aou-multiomics-analysis/aggregate_susie:main"
