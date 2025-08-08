@@ -28,16 +28,12 @@ fm_data
 
 
 ########### COMMAND LINE ARGUMENTS ########
+message('Begin')
 option_list <- list(
-  #TODO look around if there is a package recognizing delimiter in dataset
-  optparse::make_option(c("--SusieParquet"), type="character", default=NULL,
-                        help="Phenotype metadata file path of genes used in expression-matrix. Tab separated", metavar = "type"),
-  optparse::make_option(c("--GencodeGTF"), type="character", default=null,
-                        help="sample metadata file path of genes used in expression-matrix. tab separated", metavar = "type"),
-  optparse::make_option(c("--OutputPrefix"), type="character", default=null,
-                        help="sample metadata file path of genes used in expression-matrix. tab separated", metavar = "type"),
-  optparse::make_option(c("--PlinkAfreq"), type="character", default=null,
-                        help="sample metadata file path of genes used in expression-matrix. tab separated", metavar = "type")
+  optparse::make_option(c("--SusieParquet"), type="character", default=NULL, metavar = "type"),
+  optparse::make_option(c("--GencodeGTF"), type="character", default=NULL, metavar = "type"),
+  optparse::make_option(c("--OutputPrefix"), type="character", default=NULL, metavar = "type"),
+  optparse::make_option(c("--PlinkAfreq"), type="character", default=NULL, metavar = "type")
 )
 
 message('Parsing command line arguments')
