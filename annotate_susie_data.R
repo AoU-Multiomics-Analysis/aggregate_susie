@@ -20,7 +20,8 @@ dat
 load_finemapping_data <- function(path){
    
 fm_data <- arrow::read_parquet(path) %>% 
-    separate(variant_id,into = c('chrom','pos','alt')) %>% 
+    separate(variant,into = c('chrom','pos','alt')) %>%
+    mutate(chrom = case_when(str_detect(chrom,'chrchr') ~ str_remove(chrom,'chr'),TRUE ~ chrom)) %>% 
     extract(pos, into = c("pos", "ref"), regex = "([0-9]+)([A-Za-z]+)") 
 fm_data
     
