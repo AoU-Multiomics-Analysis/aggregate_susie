@@ -9,7 +9,9 @@ load_afreq_data <- function(afreq_path){
 
 #split_name <- str_split(basename(afreq_path),'_|\\.') %>% unlist()
 #group <- split_name[3]
-dat <- fread(afreq_path) 
+dat <- fread(afreq_path) %>% 
+        dplyr::rename('variant' = 'ID') %>% 
+        mutate(variant = str_replace(variant,':','_'))
   #      mutate(group  = group ) %>% 
         #select(-1)  
 dat     
@@ -19,10 +21,11 @@ dat
 
 load_finemapping_data <- function(path){
    
-fm_data <- arrow::read_parquet(path) %>% 
-    separate(variant,into = c('chrom','pos','alt')) %>%
-    mutate(chrom = case_when(str_detect(chrom,'chrchr') ~ str_remove(chrom,'chr'),TRUE ~ chrom)) %>% 
-    extract(pos, into = c("pos", "ref"), regex = "([0-9]+)([A-Za-z]+)") 
+fm_data <- arrow::read_parquet(path)  %>% 
+    #separate(variant,into = c('chrom','pos','alt')) %>%
+    #mutate(chrom = case_when(str_detect(chrom,'chrchr') ~ str_remove(chrom,'chr'),TRUE ~ chrom)) %>% 
+    #extract(pos, into = c("pos", "ref"), regex = "([0-9]+)([A-Za-z]+)") %>% 
+    mutate(variant = paste(paste0('chr',chromosome),position,ref,alt,sep='_'))
 fm_data
     
 }
