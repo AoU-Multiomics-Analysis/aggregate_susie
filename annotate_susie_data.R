@@ -73,7 +73,7 @@ tss_data <- gene_data %>% mutate(tss = case_when(strand == '+' ~ start,TRUE ~ en
 message('Annotating fine-mapping data')
 annotated_fm_res <-  susie_res %>%
   mutate(group = OutputPrefix) %>% 
-  left_join(allele_frequencies %>% select(-REF,-ALT),by = c('variant' = 'ID','group')) %>% 
+  left_join(allele_frequencies %>% select(-REF,-ALT),by = 'variant' ) %>% 
   mutate(MAF = case_when(ALT_FREQS > .5 ~ 1 -ALT_FREQS,TRUE ~ ALT_FREQS)) %>% 
   mutate(
         AF_bin = case_when(
