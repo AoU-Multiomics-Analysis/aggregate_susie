@@ -11,7 +11,12 @@ load_afreq_data <- function(afreq_path){
 #group <- split_name[3]
 dat <- fread(afreq_path) %>% 
         dplyr::rename('variant' = 'ID') %>% 
-        mutate(variant = str_replace(variant,':','_'))
+        mutate(variant = str_replace(variant,':','_')) %>% 
+        separate(variant,into = c('chrom','pos','alt')) %>%
+        mutate(chrom = case_when(str_detect(chrom,'chrchr') ~ str_remove(chrom,'chr'),TRUE ~ chrom)) %>% 
+        extract(pos, into = c("pos", "ref"), regex = "([0-9]+)([A-Za-z]+)") %>% 
+        mutate(variant = paste(chrom,pos,ref,alt)) %>% 
+        dplyr::select(variant,ALT_FREQS)
   #      mutate(group  = group ) %>% 
         #select(-1)  
 dat     
@@ -73,7 +78,7 @@ tss_data <- gene_data %>% mutate(tss = case_when(strand == '+' ~ start,TRUE ~ en
 message('Annotating fine-mapping data')
 annotated_fm_res <-  susie_res %>%
   mutate(group = OutputPrefix) %>% 
-  left_join(allele_frequencies %>% select(-REF,-ALT),by = 'variant' ) %>% 
+  left_join(allele_frequencies,by = 'variant' ) %>% 
   mutate(MAF = case_when(ALT_FREQS > .5 ~ 1 -ALT_FREQS,TRUE ~ ALT_FREQS)) %>% 
   mutate(
         AF_bin = case_when(
@@ -86,7 +91,8 @@ annotated_fm_res <-  susie_res %>%
     left_join(tss_data %>% data.frame() %>% select(-seqnames,-start,-end,-width,-strand) ,by = 'gene_id')  %>% 
     mutate(distTSS = as.numeric(position) - as.numeric(tss),
            PIP_bin = cut(pip,breaks = 5)
-    )  
+    )  %>% 
+    dplyr::select(-ALT_FREQS)
 
 
 message('Writing to output') 
