@@ -4,16 +4,21 @@ version 1.0
 
 task AggregateSusie{
     input{
-        Array[File] SusieParquets
+        #Array[File] SusieParquets
+        File SusieParquetsFOFN
         Int Memory
         String OutputPrefix
     }
 
     command <<<
-    for file in ~{sep=' ' SusieParquets}; do
-       echo $file >> filelist.txt
+    
+    mkdir -p localized 
+    awk '{print $1}' ~{SusieParquetsFOFN} | grep -v '^$' | while read -r path; do
+      gsutil cp "$path" localized/  
     done
 
+    # Write the new local file paths into filelist.txt
+    ls -1 "$(pwd)/localized/*" > filelist.txt
     Rscript /tmp/merge_susie.R --FilePaths filelist.txt  --OutputPrefix ~{OutputPrefix}
     >>>
 
@@ -64,7 +69,8 @@ task AnnotateSusie {
 
 workflow AggregateSusieWorkflow {
     input {
-        Array[File] SusieParquets 
+        #Array[File] SusieParquets
+        File SusieParquetsFOFN
         Int Memory 
         String OutputPrefix
         File GencodeGTF 
@@ -73,7 +79,7 @@ workflow AggregateSusieWorkflow {
     
     call AggregateSusie {
         input:
-            SusieParquets = SusieParquets,
+            SusieParquetsFOFN = SusieParquetsFOFN,
             OutputPrefix = OutputPrefix,
             Memory = Memory
     }
