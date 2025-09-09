@@ -8,14 +8,17 @@ task AggregateSusie{
         File SusieParquetsFOFN
         Int Memory
         String OutputPrefix
+        Int NumThreads 
     }
 
     command <<<
-    
-    mkdir -p localized 
-    awk '{print $1}' ~{SusieParquetsFOFN} | grep -v '^$' | while read -r path; do
-      gsutil cp "$path" localized/  
-    done
+    export GSUTIL_PARALLEL_PROCESS_COUNT=32
+    export GSUTIL_PARALLEL_THREAD_COUNT=8
+
+    awk '{print $1}' ~{SusieParquetsFOFN} | grep -v '^$' > file_paths.txt 
+
+    mkdir -p localized
+    gsutil -m cp -I localized/ < file_paths.txt 
 
     # Write the new local file paths into filelist.txt
     ls -1 "$(pwd)/localized/*" > filelist.txt
@@ -26,7 +29,7 @@ task AggregateSusie{
         docker: "ghcr.io/aou-multiomics-analysis/aggregate_susie:main"
         disks: "local-disk 500 SSD"
         memory: "~{Memory}GB"
-        cpu: "1"
+        cpu: "~{NumThreads}"
     }
  
 
@@ -75,13 +78,15 @@ workflow AggregateSusieWorkflow {
         String OutputPrefix
         File GencodeGTF 
         File PlinkAfreq
+        Int NumThreads
     }
     
     call AggregateSusie {
         input:
             SusieParquetsFOFN = SusieParquetsFOFN,
             OutputPrefix = OutputPrefix,
-            Memory = Memory
+            Memory = Memory,
+            NumThreads = NumThreads
     }
 
     call AnnotateSusie {
