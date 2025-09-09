@@ -13,6 +13,7 @@ RUN micromamba install -y -n base -c conda-forge -c bioconda \
     bioconda::bioconductor-rtracklayer \
     conda-forge::r-arrow \
     bioconda::bioconductor-plyranges \
+    conda-forge::gsutil \
     google-cloud-sdk
 
 
