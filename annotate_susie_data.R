@@ -12,10 +12,10 @@ load_afreq_data <- function(afreq_path){
 dat <- fread(afreq_path) %>% 
         dplyr::rename('variant' = 'ID') %>% 
         mutate(variant = str_replace(variant,':','_')) %>% 
-        separate(variant,into = c('chrom','pos','alt')) %>%
-        mutate(chrom = case_when(str_detect(chrom,'chrchr') ~ str_remove(chrom,'chr'),TRUE ~ chrom)) %>% 
-        extract(pos, into = c("pos", "ref"), regex = "([0-9]+)([A-Za-z]+)") %>% 
-        mutate(variant = paste(chrom,pos,ref,alt,sep='_')) %>% 
+        #separate(variant,into = c('chrom','pos','alt')) %>%
+        #mutate(chrom = case_when(str_detect(chrom,'chrchr') ~ str_remove(chrom,'chr'),TRUE ~ chrom)) %>% 
+        #extract(pos, into = c("pos", "ref"), regex = "([0-9]+)([A-Za-z]+)") %>% 
+        #mutate(variant = paste(chrom,pos,ref,alt,sep='_')) %>% 
         dplyr::select(variant,ALT_FREQS)
   #      mutate(group  = group ) %>% 
         #select(-1)  
