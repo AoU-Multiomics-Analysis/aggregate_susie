@@ -171,8 +171,7 @@ gnomad_data <- load_constraint_data(PathGnomad)
 
 allele_frequencies <- load_afreq_data(opt$PlinkAfreq)
 
-message('Loading finemapping')
-susie_res <- load_finemapping_data(opt$SusieParquet)
+#susie_res <- load_finemapping_data(opt$SusieParquet)
 
 
 message('Loading GTF')
