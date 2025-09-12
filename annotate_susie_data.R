@@ -3,7 +3,7 @@ library(data.table)
 library(rtracklayer)
 library(arrow)
 library(plyranges)
-
+library(bedr)
 
 ########## LOADING FUNCTIONS ##################
 
@@ -24,7 +24,9 @@ ENCODE_cres <- fread(ENCODE_cCRES_path) %>%
     dplyr::rename('seqnames' =1,'start' =2,'end' =3,'type' =6)  %>% 
     separate_rows(type,sep = ',') %>% 
     mutate(value = TRUE) %>% 
-    pivot_wider(names_from = type,values_from = value,values_fill = FALSE)
+    pivot_wider(names_from = type,values_from = value,values_fill = FALSE) %>% 
+    makeGRangesFromDataFrame(keep.extra = TRUE)
+
 ENCODE_cres
 
 }
@@ -63,16 +65,20 @@ FANTOM5_df
 # a cleaned table that has typically been summarized 
 # to the worst consequence
 query_tabix <- function(fm_res,tabix_path) {
-ranges <- fm_res %>% 
-    transmute(variant = paste0(seqnames,':',start-1,'-',start)) %>% 
+message('Querying tabix data')
+print(head(fm_res))
+ranges <- fm_res %>%
+    mutate(chromosome = str_remove_all(chromosome,'chr')) %>% 
+    transmute(variant = paste0('chr',chromosome,':',as.numeric(position)-1,'-',position)) %>% 
     pull(variant)
-tabix_res <- tabix(ranges,tabix_path) %>% 
+tabix_res <- tabix(ranges,tabix_path,check.chr = FALSE) %>% 
         distinct()  %>%
         separate_rows(V5,sep='&') %>%  
         mutate(value = TRUE) %>% 
         mutate(V5 = str_remove_all(V5, "\\s+")) %>% 
         pivot_wider(names_from = V5,values_from = value,values_fill = FALSE) %>% 
-        dplyr::rename('seqnames' = 'V1','start' = 'V2','ref' = 'V3','alt' = 'V4')
+        dplyr::rename('chromosome' = 'V1','start' = 'V2','ref' = 'V3','alt' = 'V4')
+message('Tabix query sucessful')
 tabix_res
 }  
 
@@ -81,11 +87,17 @@ tabix_res
 query_bigwig <- function(fm_data,bw_path) {
 message(paste0('Annotating with ',basename(bw_path)))
 
-positions <- fm_data %>% makeGRangesFromDataFrame()
+
+positions <- fm_data %>%
+        mutate(start = position,end = position) %>%  	
+	makeGRangesFromDataFrame()
 bw <- BigWigFile(bw_path)
 message('importing big wig')
 phyloP_scores <- import(bw, selection = BigWigSelection(positions))
 
+message('Import sucessful')
+
+message('Merging bigwig data and variants')
 hits <- findOverlaps(positions, phyloP_scores)
 scores <- rep(NA_real_, length(positions))
 scores[queryHits(hits)] <- mcols(phyloP_scores)$score[subjectHits(hits)]
@@ -100,9 +112,13 @@ query_vep_table <- function(fm_data,VEP_table) {
 message('Annotating with VEP')
 VEP_annotation_data <- query_tabix(fm_data ,VEP_table)
 
+print(head(fm_data))
+message('Merging VEP data with variants')
 VEP_annotated <- fm_data %>% 
-    mutate(start = as.character(start)) %>% 
-    left_join(VEP_annotations,by = c('seqnames','start','ref','alt')) %>% 
+    mutate(start = as.character(position)) %>%
+    mutate(chromosome = str_remove_all(chromosome,'chr')) %>% 
+    mutate(chromosome = paste0('chr',chromosome)) %>%  
+    left_join(VEP_annotation_data,by = c('chromosome','start','ref','alt')) %>% 
     mutate(
      synonymous_variant = ifelse(
       # check if ANY logical column other than keep is TRUE
@@ -111,19 +127,24 @@ VEP_annotated <- fm_data %>%
       synonymous_variant
         )
       )
+message('VEP merge sucessful')
 VEP_annotated
 }
 
 # helper function to annotate fine mapped data with granges 
 # object
 query_grange_data <- function(fm_data,grange_annotations) {
+message('annotating data with grange')
+
 annotated_fm_data <- fm_data %>% 
     mutate(start = position,end = position) %>% 
+    mutate(chromosome = str_remove_all(chromosome,'chr')) %>% 
     mutate(chromosome = paste0('chr',chromosome)) %>% 
     makeGRangesFromDataFrame(keep.extra = TRUE) %>% 
     join_overlap_left(grange_annotations) %>% 
     data.frame() %>% 
-    mutate(across(where(is.logical), ~replace_na(., FALSE)))
+    mutate(across(where(is.logical), ~replace_na(., FALSE))) %>% 
+    dplyr::rename('chromosome' = 'seqnames')
 annotated_fm_data
 
 }
@@ -171,6 +192,7 @@ gnomad_data <- load_constraint_data(PathGnomad)
 
 allele_frequencies <- load_afreq_data(opt$PlinkAfreq)
 
+print(head(allele_frequencies))
 #susie_res <- load_finemapping_data(opt$SusieParquet)
 
 
@@ -189,7 +211,9 @@ tss_data <- gene_data %>% mutate(tss = case_when(strand == '+' ~ start,TRUE ~ en
 # generated from QTL mapping
 message('Annotating fine-mapping data')
 annotated_fm_res <-  arrow::read_parquet(PathSusie) %>%
-  mutate(group = OutputPrefix) %>% 
+  mutate(group = OutputPrefix) %>%
+  mutate(variant = str_remove_all(variant,'chr')) %>% 
+  mutate(variant = paste0('chr',variant)) %>% 
   left_join(allele_frequencies,by = 'variant' ) %>% 
   mutate(MAF = case_when(ALT_FREQS > .5 ~ 1 -ALT_FREQS,TRUE ~ ALT_FREQS)) %>% 
   mutate(
@@ -204,17 +228,17 @@ annotated_fm_res <-  arrow::read_parquet(PathSusie) %>%
     mutate(distTSS = as.numeric(position) - as.numeric(tss),
            PIP_bin = cut(pip,breaks = 5)
     )  %>% 
-    dplyr::select(-ALT_FREQS ) %>%
+    #dplyr::select(-ALT_FREQS ) %>%
     mutate(PIP_decile = cut(pip, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)) %>%  
     mutate(gene_id = str_remove(molecular_trait_id,'\\..*')) 
 
-
+print(head(annotated_fm_res))
 message('Annotating fine-mapping data with external data sources')
 full_annotated_data <- annotated_fm_res %>%
             query_grange_data(ENCODE_data) %>% 
             query_grange_data(FANTOM5_granges) %>% 
             query_vep_table(PathVEP)  %>%
-            query_bigwig(PathPhyloP)
+            query_bigwig(PathPhyloP) %>% 
             left_join(gnomad_data,by = 'gene_id')  
 
 message('Cleaning annotated data')
@@ -234,3 +258,4 @@ cleaned_full_annotated_data <- full_annotated_data %>%
 message('Writing to output') 
 cleaned_full_annotated_data %>% arrow::write_parquet(annotated_parquet)
  
+
