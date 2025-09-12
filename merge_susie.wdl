@@ -49,10 +49,25 @@ task AnnotateSusie {
         File PlinkAfreq
         String OutputPrefix
         Int Memory
-     
+        File AnnotationENCODE 
+        File AnnotationFANTOM5 
+        File AnnotationVEP 
+        File AnnotationGnomad 
+        File AnnotationPhyloP 
+      
+
     }
     command <<<
-    Rscript /tmp/annotate_susie_data.R --OutputPrefix ~{OutputPrefix} --GencodeGTF ~{GencodeGTF} --PlinkAfreq ~{PlinkAfreq} --SusieParquet ~{SusieParquet}
+    Rscript /tmp/annotate_susie_data.R \
+        --OutputPrefix ~{OutputPrefix} \
+        --GencodeGTF ~{GencodeGTF} \
+        --PlinkAfreq ~{PlinkAfreq} \
+        --SusieParquet ~{SusieParquet} \
+        --phyloPBigWig ~{AnnotationPhyloP} \
+        --FANTOM5 ~{AnnotationFANTOM5} \
+        --gnomadConstraint ~{AnnotationGnomad} \
+        --ENCODEcCRES ~{AnnotationENCODE} \
+        --VEPAnnotationsTable ~{AnnotationVEP}
     >>>
    runtime {
         docker: "ghcr.io/aou-multiomics-analysis/aggregate_susie:main"
@@ -76,9 +91,16 @@ workflow AggregateSusieWorkflow {
         File SusieParquetsFOFN
         Int Memory 
         String OutputPrefix
+        Int NumThreads
+
         File GencodeGTF 
         File PlinkAfreq
-        Int NumThreads
+        File AnnotationPhyloP 
+        File AnnotationENCODE 
+        File AnnotationFANTOM5 
+        File AnnotationVEP 
+        File AnnotationGnomad 
+        File AnnotationFANTOM5
     }
     
     call AggregateSusie {
@@ -95,7 +117,12 @@ workflow AggregateSusieWorkflow {
             GencodeGTF = GencodeGTF,
             PlinkAfreq = PlinkAfreq,
             OutputPrefix = OutputPrefix,
-            Memory = Memory
+            Memory = Memory,
+            PhyloPBigWig = PhyloPBigWig,
+            AnnotationsENCODE = AnnotationsENCODE,
+            AnnotationsFANTOM5 = AnnotationsFANTOM5,
+            VEPAnnotationTable = VEPAnnotationTable,
+            ConstraintGnomad = ConstraintGnomad
     } 
 
     output {
