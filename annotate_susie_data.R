@@ -47,7 +47,7 @@ dat
 # as of right now is downloaded from the UCSC genome browser
 load_FANTOM5_data <- function(FANTOM5_path) {
 message('Loading FANTOM5 data')
-FANTOM5_df <- fread(FANTOM5) %>% 
+FANTOM5_df <- fread(FANTOM5_path) %>% 
     dplyr::rename('seqnames' ='V1','start' = 'V2','end' ='V3') %>% 
     mutate(FANTOM5 = TRUE) %>% 
     select(seqnames:end,FANTOM5) %>% 
