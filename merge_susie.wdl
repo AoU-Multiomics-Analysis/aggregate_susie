@@ -100,7 +100,6 @@ workflow AggregateSusieWorkflow {
         File AnnotationFANTOM5 
         File AnnotationVEP 
         File AnnotationGnomad 
-        File AnnotationFANTOM5
     }
     
     call AggregateSusie {
@@ -118,11 +117,11 @@ workflow AggregateSusieWorkflow {
             PlinkAfreq = PlinkAfreq,
             OutputPrefix = OutputPrefix,
             Memory = Memory,
-            PhyloPBigWig = PhyloPBigWig,
-            AnnotationsENCODE = AnnotationsENCODE,
-            AnnotationsFANTOM5 = AnnotationsFANTOM5,
-            VEPAnnotationTable = VEPAnnotationTable,
-            ConstraintGnomad = ConstraintGnomad
+            AnnotationPhyloP = AnnotationPhyloP,
+            AnnotationENCODE = AnnotationENCODE,
+            AnnotationFANTOM5 = AnnotationFANTOM5,
+            AnnotationVEP = AnnotationVEP,
+            AnnotationGnomad = AnnotationGnomad
     } 
 
     output {
