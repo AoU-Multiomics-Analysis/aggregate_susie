@@ -160,7 +160,7 @@ PathENCODE <- opt$ENCODEcCRES
 PathPhyloP <- opt$phyloPBigWig
 PathGnomad <- opt$gnomadConstraint
 PathFANTOM5 <- opt$FANTOM5
-
+PathSusie <- opt$SusieParquet
 
 ########### LOAD DATA ############
 
@@ -189,7 +189,7 @@ tss_data <- gene_data %>% mutate(tss = case_when(strand == '+' ~ start,TRUE ~ en
 # annotate fine mapping data with internal data 
 # generated from QTL mapping
 message('Annotating fine-mapping data')
-annotated_fm_res <-  susie_res %>%
+annotated_fm_res <-  arrow::read_parquet(PathSusie) %>%
   mutate(group = OutputPrefix) %>% 
   left_join(allele_frequencies,by = 'variant' ) %>% 
   mutate(MAF = case_when(ALT_FREQS > .5 ~ 1 -ALT_FREQS,TRUE ~ ALT_FREQS)) %>% 
