@@ -141,7 +141,7 @@ option_list <- list(
   optparse::make_option(c("--VEPAnnotationsTable"), type="character", default=NULL, metavar = "type"),
   optparse::make_option(c("--gnomadConstraint"), type="character", default=NULL, metavar = "type"),
   optparse::make_option(c("--phyloPBigWig"), type="character", default=NULL, metavar = "type"),
-  optparse::make_option(c("--FANTOM5"), type="character", default=NULL, metavar = "type"),
+  optparse::make_option(c("--FANTOM5"), type="character", default=NULL, metavar = "type")
 
 )
 
