@@ -51,7 +51,8 @@ task AnnotateSusie {
         Int Memory
         File AnnotationENCODE 
         File AnnotationFANTOM5 
-        File AnnotationVEP 
+        File AnnotationVEP
+        File AnnotationVEPIndex 
         File AnnotationGnomad 
         File AnnotationPhyloP 
       
@@ -99,7 +100,9 @@ workflow AggregateSusieWorkflow {
         File AnnotationENCODE 
         File AnnotationFANTOM5 
         File AnnotationVEP 
-        File AnnotationGnomad 
+        File AnnotationGnomad
+        File AnnotationVEPIndex 
+
     }
     
     call AggregateSusie {
@@ -121,6 +124,7 @@ workflow AggregateSusieWorkflow {
             AnnotationENCODE = AnnotationENCODE,
             AnnotationFANTOM5 = AnnotationFANTOM5,
             AnnotationVEP = AnnotationVEP,
+            AnnotationVEPIndex = AnnotationVEPIndex,
             AnnotationGnomad = AnnotationGnomad
     } 
 
