@@ -9,6 +9,8 @@ library(bedr)
 
 load_constraint_data <- function(gnomad_constraint_data) {
 message('Loading gnomad data')
+message(paste0('Using file: ',basename(gnomad_constraint_data)))
+
 gnomad_dat <- fread(gnomad_constraint_data) %>% 
             filter(canonical == TRUE) %>% 
             select(gene_id,`lof.pLI`) %>% 
@@ -20,6 +22,7 @@ gnomad_dat
 # load encode hg38 regulatory element annotations
 load_ENCODE_data <- function(ENCODE_cCRES_path) {
 message('Loading ENCODE data')
+message(paste0('Using file: ',basename(ENCODE_cCRES_path)))
 ENCODE_cres <- fread(ENCODE_cCRES_path) %>% 
     dplyr::rename('seqnames' =1,'start' =2,'end' =3,'type' =6)  %>% 
     separate_rows(type,sep = ',') %>% 
@@ -35,6 +38,8 @@ ENCODE_cres
 # load plink allele frequency data
 load_afreq_data <- function(afreq_path){
 message('Loading allele frequency data')
+message(paste0('Using file: ',basename(afreq_path)))
+
 dat <- fread(afreq_path) %>% 
         dplyr::rename('variant' = 'ID') %>% 
         mutate(variant = str_replace(variant,':','_')) %>% 
@@ -49,6 +54,8 @@ dat
 # as of right now is downloaded from the UCSC genome browser
 load_FANTOM5_data <- function(FANTOM5_path) {
 message('Loading FANTOM5 data')
+message(paste0('Using file: ',basename(FANTOM5_path)))
+
 FANTOM5_df <- fread(FANTOM5_path) %>% 
     dplyr::rename('seqnames' ='V1','start' = 'V2','end' ='V3') %>% 
     mutate(FANTOM5 = TRUE) %>% 
