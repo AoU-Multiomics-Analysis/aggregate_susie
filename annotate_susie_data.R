@@ -27,8 +27,8 @@ ENCODE_cres <- fread(ENCODE_cCRES_path) %>%
     dplyr::rename('seqnames' =1,'start' =2,'end' =3,'type' =6)  %>% 
     separate_rows(type,sep = ',') %>% 
     mutate(value = TRUE) %>% 
-    pivot_wider(names_from = type,values_from = value,values_fill = FALSE) %>% 
-    makeGRangesFromDataFrame(keep.extra = TRUE)
+	pivot_wider(names_from = type,values_from = value,values_fill = list(value = FALSE)) %>%   
+	makeGRangesFromDataFrame(keep.extra = TRUE)
 
 ENCODE_cres
 
