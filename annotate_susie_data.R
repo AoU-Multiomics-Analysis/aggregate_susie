@@ -66,7 +66,7 @@ FANTOM5_df
 # to the worst consequence
 query_tabix <- function(fm_res,tabix_path) {
 message('Querying tabix data')
-print(head(fm_res))
+
 ranges <- fm_res %>%
     mutate(chromosome = str_remove_all(chromosome,'chr')) %>% 
     transmute(variant = paste0('chr',chromosome,':',as.numeric(position)-1,'-',position)) %>% 
@@ -112,7 +112,6 @@ query_vep_table <- function(fm_data,VEP_table) {
 message('Annotating with VEP')
 VEP_annotation_data <- query_tabix(fm_data ,VEP_table)
 
-print(head(fm_data))
 message('Merging VEP data with variants')
 VEP_annotated <- fm_data %>% 
     mutate(start = as.character(position)) %>%
@@ -192,7 +191,6 @@ gnomad_data <- load_constraint_data(PathGnomad)
 
 allele_frequencies <- load_afreq_data(opt$PlinkAfreq)
 
-print(head(allele_frequencies))
 #susie_res <- load_finemapping_data(opt$SusieParquet)
 
 
@@ -232,7 +230,6 @@ annotated_fm_res <-  arrow::read_parquet(PathSusie) %>%
     mutate(PIP_decile = cut(pip, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)) %>%  
     mutate(gene_id = str_remove(molecular_trait_id,'\\..*')) 
 
-print(head(annotated_fm_res))
 message('Annotating fine-mapping data with external data sources')
 full_annotated_data <- annotated_fm_res %>%
             query_grange_data(ENCODE_data) %>% 
