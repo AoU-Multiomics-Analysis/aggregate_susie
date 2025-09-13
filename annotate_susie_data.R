@@ -160,7 +160,7 @@ annotated_fm_data
 ########### COMMAND LINE ARGUMENTS ########
 message('Begin')
 option_list <- list(
-  optparse::make_option(c("--SusieParquet"), type="character", default=NULL, metavar = "type"),
+  optparse::make_option(c("--SusieTSV"), type="character", default=NULL, metavar = "type"),
   optparse::make_option(c("--GencodeGTF"), type="character", default=NULL, metavar = "type"),
   optparse::make_option(c("--OutputPrefix"), type="character", default=NULL, metavar = "type"),
   optparse::make_option(c("--PlinkAfreq"), type="character", default=NULL, metavar = "type"),
@@ -178,8 +178,8 @@ opt <- optparse::parse_args(optparse::OptionParser(option_list=option_list))
 OutputPrefix <- opt$OutputPrefix
 
 
-annotated_parquet <- paste0(opt$OutputPrefix,'_SusieMerged.annotated.parquet') 
-message(paste0('Writing to:',annotated_parquet))
+annotated_tsv <- paste0(opt$OutputPrefix,'_SusieMerged.annotated.tsv') 
+message(paste0('Writing to:',annotated_tsv))
 
 # this file needs to be a parsed version of the a VEP consequences VCF
 PathVEP <- opt$VEPAnnotationsTable
@@ -187,7 +187,7 @@ PathENCODE <- opt$ENCODEcCRES
 PathPhyloP <- opt$phyloPBigWig
 PathGnomad <- opt$gnomadConstraint
 PathFANTOM5 <- opt$FANTOM5
-PathSusie <- opt$SusieParquet
+PathSusie <- opt$SusieTSV
 
 ########### LOAD DATA ############
 
@@ -208,14 +208,14 @@ message('Extracting TSS  locations')
 tss_data <- gene_data %>% mutate(tss = case_when(strand == '+' ~ start,TRUE ~ end)) %>% 
             dplyr::select(seqid,tss,gene_id,gene_type,gene_name) %>% 
             mutate(start = tss,end = tss ) %>% 
-             makeGRangesFromDataFrame(keep.extra = TRUE)
+            makeGRangesFromDataFrame(keep.extra = TRUE)
 
 
 
 # annotate fine mapping data with internal data 
 # generated from QTL mapping
 message('Annotating fine-mapping data')
-annotated_fm_res <-  arrow::read_parquet(PathSusie) %>%
+annotated_fm_res <-  fread(PathSusie) %>%
   mutate(group = OutputPrefix) %>%
   mutate(variant = str_remove_all(variant,'chr')) %>% 
   mutate(variant = paste0('chr',variant)) %>% 
@@ -260,6 +260,6 @@ cleaned_full_annotated_data <- full_annotated_data %>%
 
 
 message('Writing to output') 
-cleaned_full_annotated_data %>% arrow::write_parquet(annotated_parquet)
+cleaned_full_annotated_data %>% write_tsv(annotated_tsv)
  
 

@@ -2,7 +2,7 @@ version 1.0
 
 task AnnotateSusieTask {
     input {
-        File SusieParquet 
+        File SusieTSV
         File GencodeGTF
         File PlinkAfreq
         String OutputPrefix
@@ -21,7 +21,7 @@ task AnnotateSusieTask {
         --OutputPrefix ~{OutputPrefix} \
         --GencodeGTF ~{GencodeGTF} \
         --PlinkAfreq ~{PlinkAfreq} \
-        --SusieParquet ~{SusieParquet} \
+        --SusieTSV ~{SusieTSV} \
         --phyloPBigWig ~{AnnotationPhyloP} \
         --FANTOM5 ~{AnnotationFANTOM5} \
         --gnomadConstraint ~{AnnotationGnomad} \
@@ -37,7 +37,7 @@ task AnnotateSusieTask {
 
 
     output {
-        File AnnotatedSusieParquetOut = "~{OutputPrefix}_SusieMerged.annotated.parquet" 
+        File AnnotatedSusieTSVOut = "~{OutputPrefix}_SusieMerged.annotated.tsv" 
     }
 
 }
@@ -46,7 +46,7 @@ task AnnotateSusieTask {
 workflow AnnotateSusie {
     input {
         #Array[File] SusieParquets
-        File SusieParquet
+        File SusieTSV
         Int Memory 
         String OutputPrefix
         Int NumThreads
@@ -63,7 +63,7 @@ workflow AnnotateSusie {
     }
     call AnnotateSusieTask {
         input:
-            SusieParquet = SusieParquet,
+            SusieTSV = SusieTSV,
             GencodeGTF = GencodeGTF,
             PlinkAfreq = PlinkAfreq,
             OutputPrefix = OutputPrefix,
@@ -77,6 +77,6 @@ workflow AnnotateSusie {
     } 
 
     output {
-        File AnnotatedMergedSusieParquet = AnnotateSusieTask.AnnotatedSusieParquetOut
+        File AnnotatedMergedSusieTSV = AnnotateSusieTask.AnnotatedSusieTSVOut
        }
     }
