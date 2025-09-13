@@ -14,7 +14,7 @@ RUN micromamba install -y -n base -c conda-forge -c bioconda \
     conda-forge::r-arrow \
     bioconda::bioconductor-plyranges \
     conda-forge::google-cloud-sdk \
-    bioconda::r-bedr \
+    conda-forge::r-bedr \
     bioconda::tabix
 
 COPY merge_susie.R .
