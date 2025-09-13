@@ -13,7 +13,8 @@ RUN micromamba install -y -n base -c conda-forge -c bioconda \
     bioconda::bioconductor-rtracklayer \
     conda-forge::r-arrow \
     bioconda::bioconductor-plyranges \
-    conda-forge::google-cloud-sdk
+    conda-forge::google-cloud-sdk \
+    bioconda::r-bedr
 
 COPY merge_susie.R .
 COPY annotate_susie_data.R . 
