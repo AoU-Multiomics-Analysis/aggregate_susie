@@ -2,3 +2,8 @@ version: 1.2
 workflows:
   - subclass: WDL 
     primaryDescriptorPath: /merge_susie.wdl
+    name: merge_susie 
+  - subclass: WDL 
+    primaryDescriptorPath: /workflows/annotate_susie.wdl
+    name: AnnotateSusie 
+
