@@ -63,7 +63,7 @@ task AnnotateSusie {
         --OutputPrefix ~{OutputPrefix} \
         --GencodeGTF ~{GencodeGTF} \
         --PlinkAfreq ~{PlinkAfreq} \
-        --SusieParquet ~{SusieTSV} \
+        --SusieTSV ~{SusieTSV} \
         --phyloPBigWig ~{AnnotationPhyloP} \
         --FANTOM5 ~{AnnotationFANTOM5} \
         --gnomadConstraint ~{AnnotationGnomad} \
