@@ -221,6 +221,7 @@ annotated_fm_res <-  fread(PathSusie) %>%
   mutate(variant = paste0('chr',variant)) %>% 
   left_join(allele_frequencies,by = 'variant' ) %>% 
   mutate(MAF = case_when(ALT_FREQS > .5 ~ 1 -ALT_FREQS,TRUE ~ ALT_FREQS)) %>% 
+  mutate(posterior_mean = case_when(ALT_FREQS > .5 ~ -posterior_mean,TRUE ~ posterior_mean)) %>% 
   mutate(
         AF_bin = case_when(
           MAF  < 0.01 ~ "rare (0.1–1%)",
