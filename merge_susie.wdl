@@ -9,6 +9,7 @@ task AggregateSusie{
         Int Memory
         String OutputPrefix
         Int NumThreads 
+        String AggregateMode # should be either lbf or pip
     }
 
     command <<<
@@ -22,7 +23,7 @@ task AggregateSusie{
 
     # Write the new local file paths into filelist.txt
     ls -1 "$(pwd)/localized/*" > filelist.txt
-    Rscript /tmp/merge_susie.R --FilePaths file_paths.txt  --OutputPrefix ~{OutputPrefix}
+    Rscript /tmp/merge_susie.R --FilePaths file_paths.txt  --OutputPrefix ~{OutputPrefix} --AggregateMode ~{AggregateMode}
     >>>
 
     runtime {
@@ -92,6 +93,7 @@ workflow AggregateSusieWorkflow {
         File SusieParquetsFOFN
         Int Memory 
         String OutputPrefix
+        String AggregateMode
         Int NumThreads
 
         File GencodeGTF 
@@ -102,7 +104,7 @@ workflow AggregateSusieWorkflow {
         File AnnotationVEP 
         File AnnotationGnomad
         File AnnotationVEPIndex 
-
+    
     }
     
     call AggregateSusie {
@@ -110,7 +112,8 @@ workflow AggregateSusieWorkflow {
             SusieParquetsFOFN = SusieParquetsFOFN,
             OutputPrefix = OutputPrefix,
             Memory = Memory,
-            NumThreads = NumThreads
+            NumThreads = NumThreads,
+            AggregateMode = AggregateMode
     }
 
     call AnnotateSusie {
