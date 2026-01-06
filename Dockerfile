@@ -6,7 +6,8 @@ FROM ghcr.io/prefix-dev/pixi:latest
 #ENV PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 ## Create a new environment and install packages
-RUN pixi global install -c anaconda -c dnachun -c conda-forge -c bioconda r-base=4.4 tabix google-cloud-sdk python=3.11 
+RUN pixi global install -c conda-forge -c bioconda r-base=4.4 tabix google-cloud-sdk
+RUN pixi global install --environment google-cloud-sdk python=3.11 
 RUN pixi global install --environment r-base \
     r-optparse \
     r-bedr \
