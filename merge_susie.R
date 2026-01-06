@@ -10,7 +10,7 @@ option_list <- list(
                         help="Phenotype metadata file path of genes used in expression-matrix. Tab separated", metavar = "type"),
   optparse::make_option(c("--OutputPrefix"), type="character", default=NULL,
                         help="Sample metadata file path of genes used in expression-matrix. Tab separated", metavar = "type"),
-  optparse::make_option(c("--SusieType"), type="character", choices = c('lbf','pip'),help = "chose type of susie output either lbf or pip")
+  optparse::make_option(c("--SusieType"), type="character", default=NULL, help = "chose type of susie output either lbf or pip")
 )
 
 opt <- optparse::parse_args(optparse::OptionParser(option_list=option_list))
