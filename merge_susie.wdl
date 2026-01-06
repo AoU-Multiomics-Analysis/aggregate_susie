@@ -23,7 +23,7 @@ task AggregateSusie{
 
     # Write the new local file paths into filelist.txt
     ls -1 "$(pwd)/localized/"* > filelist.txt
-    Rscript /merge_susie.R --FilePaths file_paths.txt  --OutputPrefix ~{OutputPrefix} --AggregateMode ~{AggregateMode}
+    Rscript /merge_susie.R --FilePaths file_paths.txt  --OutputPrefix ~{OutputPrefix} --SusieType ~{AggregateMode}
     >>>
 
     runtime {
