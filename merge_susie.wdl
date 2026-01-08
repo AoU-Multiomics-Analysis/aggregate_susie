@@ -60,7 +60,7 @@ task AnnotateSusie {
 
     }
     command <<<
-    Rscript /tmp/annotate_susie_data.R \
+    Rscript /annotate_susie_data.R \
         --OutputPrefix ~{OutputPrefix} \
         --GencodeGTF ~{GencodeGTF} \
         --PlinkAfreq ~{PlinkAfreq} \
